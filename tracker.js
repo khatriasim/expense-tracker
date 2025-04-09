@@ -6,13 +6,48 @@ if (blocal) {
     budget = getbudget
 }
 
+let alertdiv = document.getElementById("budgetAlerts")
+function checkbudget(){
+    alertdiv.innerHTML = ""
+    let spendingCategory = {}
+    transactions.forEach(element => {
+        if (element.type === "expense") {
+            let category = element.category
+            let amount = parseFloat(element.amount)
+
+            if (!spendingCategory[category]) {
+                spendingCategory[category] = 0;
+            }
+            spendingCategory[category] += amount;
+        
+    }
+    });
+    console.log("Spending by category:", spendingCategory);
+
+    const spendingAmount = spendingCategory[category]
+    const budgetAmount = parseFloat(budget[category].amount);
+    for (const category in budget) {
+        if (spendingCategory[category]){
+        }
+        if (spendingAmount > budgetAmount ) {
+            const overamount = spendingAmount - budgetAmount;
+            const alertmessage = `you have eceded your budget for ${category} by ${overamount.toFixed(2)}`
+            let alertElement = document.createElement("p")
+            alertElement.textContent = alertmessage
+             
+            let alertdiv = document.getElementById("budgetAlerts")
+            alertdiv.appendChild(alertElement)
+        }
+    }
+}
+
 
 
 let transactions = []
 
 
 let localdata = localStorage.getItem("transaction")
- 
+
 if (localdata) {
     transactions = JSON.parse(localdata)
     console.log('loaded transactions:', transactions);
@@ -78,7 +113,7 @@ budgetoptions.forEach(optiontext1 => {
     let newoption = document.createElement("option")
     newoption.value = optiontext1
     newoption.textContent = optiontext1
-    budgetCategory.appendChild(newoption)
+    categorybudget.appendChild(newoption)
 });
 
 let currency = document.getElementById("currency")
@@ -95,7 +130,7 @@ let transaction = document.getElementById("transactionForm")
 transaction.addEventListener("submit", (event) => {
     event.preventDefault()
     
-
+    
     let amount = document.getElementById("amount")
     let tamount = amount.value
 
@@ -137,17 +172,23 @@ setbudget.addEventListener("submit", (event) => {
     let budgetCategory = document.getElementById("budgetCategory")
     let bcat = budgetCategory.value
     
-
+    
     let budgetAmount = document.getElementById("budgetAmount")
     let bamount = budgetAmount.value
-
-    let obj = {}
-    obj.category = bcat
-    obj.amount = bamount
-
     
-
-    let bstorage = localStorage.setItem("budget", JSON.stringify(obj))
-
-
+    if (!budget) {
+        budget = {};
+    }
+    
+    // Create or update the category in the budget
+    budget[bcat] = {
+        amount: bamount
+    };
+    
+    
+    
+    let bstorage = localStorage.setItem("budget", JSON.stringify(budget))
+    
+    
+    checkbudget()
 })

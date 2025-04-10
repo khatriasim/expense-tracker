@@ -6,37 +6,37 @@ if (blocal) {
     budget = getbudget
 }
 
-let alertdiv = document.getElementById("budgetAlerts")
 function checkbudget(){
+    let alertdiv = document.getElementById("budgetAlerts")
     alertdiv.innerHTML = ""
     let spendingCategory = {}
     transactions.forEach(element => {
         if (element.type === "expense") {
             let category = element.category
             let amount = parseFloat(element.amount)
-
+            
             if (!spendingCategory[category]) {
                 spendingCategory[category] = 0;
             }
             spendingCategory[category] += amount;
         
     }
-    });
+});
     console.log("Spending by category:", spendingCategory);
-
-    const spendingAmount = spendingCategory[category]
-    const budgetAmount = parseFloat(budget[category].amount);
+    
     for (const category in budget) {
         if (spendingCategory[category]){
-        }
+        const budgetAmount = parseFloat(budget[category].amount);
+        const spendingAmount = spendingCategory[category]
         if (spendingAmount > budgetAmount ) {
             const overamount = spendingAmount - budgetAmount;
             const alertmessage = `you have eceded your budget for ${category} by ${overamount.toFixed(2)}`
             let alertElement = document.createElement("p")
             alertElement.textContent = alertmessage
-             
+            
             let alertdiv = document.getElementById("budgetAlerts")
             alertdiv.appendChild(alertElement)
+        }
         }
     }
 }
@@ -51,7 +51,7 @@ let localdata = localStorage.getItem("transaction")
 if (localdata) {
     transactions = JSON.parse(localdata)
     console.log('loaded transactions:', transactions);
-    
+    checkbudget()
 }
 
 let transactionTableBody = document.querySelector("#transactionTable tbody");
@@ -162,6 +162,7 @@ transaction.addEventListener("submit", (event) => {
     
     localStorage.setItem("transaction", JSON.stringify(transactions))
     showTransaction(transactions)
+    checkbudget()
 })  
 
 let setbudget = document.getElementById("budgetForm")
@@ -187,8 +188,6 @@ setbudget.addEventListener("submit", (event) => {
     
     
     
-    let bstorage = localStorage.setItem("budget", JSON.stringify(budget))
-    
-    
+    let bstorage = localStorage.setItem("budget", JSON.stringify(budget))  
     checkbudget()
 })
